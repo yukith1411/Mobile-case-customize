@@ -1,0 +1,1991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Anti-Gravity Smart Phone Skin & Sticker Customization Studio</title>
+  <meta name="description" content="Industrial hardware manufacturing, vector geometry cut generator, and real-time 3D WebGL engine for nano-suction smartphone skin fabrication." />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@500;700;900&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Three.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+  <style>
+    :root {
+      --bg-dark: #090c10;
+      --bg-card: rgba(18, 24, 38, 0.75);
+      --bg-card-border: rgba(56, 189, 248, 0.15);
+      --bg-card-hover: rgba(24, 32, 50, 0.85);
+      
+      --accent-cyan: #06b6d4;
+      --accent-cyan-glow: rgba(6, 182, 212, 0.35);
+      --accent-blue: #3b82f6;
+      --accent-purple: #8b5cf6;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --text-dim: #6b7280;
+
+      --panel-width: 380px;
+      --header-height: 64px;
+      --font-mono: 'Fira Code', monospace;
+      --font-heading: 'Orbitron', 'Space Grotesk', sans-serif;
+      --font-body: 'Inter', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(6, 182, 212, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(139, 92, 246, 0.08) 0%, transparent 40%),
+        linear-gradient(to bottom, rgba(9, 12, 16, 0.8), rgba(9, 12, 16, 0.95));
+      color: var(--text-main);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.6);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(56, 189, 248, 0.3);
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent-cyan);
+    }
+
+    /* HEADER */
+    header {
+      height: var(--header-height);
+      background: rgba(13, 17, 23, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--bg-card-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 15px var(--accent-cyan-glow);
+    }
+
+    .brand-text h1 {
+      font-family: var(--font-heading);
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      background: linear-gradient(90deg, #ffffff, var(--accent-cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-text p {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn {
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-main);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      font-family: var(--font-body);
+    }
+
+    .btn:hover {
+      background: rgba(51, 65, 85, 0.9);
+      border-color: rgba(255, 255, 255, 0.25);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-cyan), #0284c7);
+      border: none;
+      color: #fff;
+      box-shadow: 0 4px 14px var(--accent-cyan-glow);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #0891b2, #0369a1);
+      box-shadow: 0 6px 20px rgba(6, 182, 212, 0.5);
+    }
+
+    .btn-accent {
+      background: linear-gradient(135deg, var(--accent-purple), #6d28d9);
+      border: none;
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(139, 92, 246, 0.35);
+    }
+
+    .btn-accent:hover {
+      background: linear-gradient(135deg, #7c3aed, #5b21b6);
+    }
+
+    .badge-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: var(--accent-emerald);
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent-emerald);
+      box-shadow: 0 0 8px var(--accent-emerald);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    /* APP LAYOUT */
+    .app-container {
+      display: grid;
+      grid-template-columns: var(--panel-width) 1fr var(--panel-width);
+      height: calc(100vh - var(--header-height));
+      overflow: hidden;
+    }
+
+    .sidebar {
+      background: rgba(13, 17, 23, 0.65);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-right: 1px solid var(--bg-card-border);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      padding: 16px;
+      gap: 16px;
+    }
+
+    .sidebar-right {
+      border-right: none;
+      border-left: 1px solid var(--bg-card-border);
+    }
+
+    /* CARD COMPONENTS */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--bg-card-border);
+      border-radius: 12px;
+      padding: 16px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+      border-color: rgba(56, 189, 248, 0.3);
+    }
+
+    .card-title {
+      font-family: var(--font-heading);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .card-title .icon {
+      color: var(--accent-cyan);
+    }
+
+    /* FORM ELEMENTS */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .form-group:last-child {
+      margin-bottom: 0;
+    }
+
+    label {
+      font-size: 0.76rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .val-disp {
+      color: var(--accent-cyan);
+      font-family: var(--font-mono);
+    }
+
+    input[type="text"], select, textarea {
+      width: 100%;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+      padding: 9px 12px;
+      color: #fff;
+      font-size: 0.82rem;
+      outline: none;
+      transition: all 0.2s ease;
+      font-family: var(--font-body);
+    }
+
+    input[type="text"]:focus, select:focus, textarea:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 10px var(--accent-cyan-glow);
+    }
+
+    .input-with-btn {
+      display: flex;
+      gap: 8px;
+    }
+
+    /* DEVICE SEARCH AUTOCOMPLETE */
+    .search-container {
+      position: relative;
+    }
+
+    .autocomplete-list {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: #0f172a;
+      border: 1px solid var(--accent-cyan);
+      border-radius: 8px;
+      max-height: 180px;
+      overflow-y: auto;
+      z-index: 50;
+      margin-top: 4px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.7);
+      display: none;
+    }
+
+    .autocomplete-item {
+      padding: 8px 12px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .autocomplete-item:hover {
+      background: rgba(6, 182, 212, 0.2);
+      color: #fff;
+    }
+
+    .autocomplete-item .tag {
+      font-size: 0.68rem;
+      font-family: var(--font-mono);
+      background: rgba(255,255,255,0.1);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--text-muted);
+    }
+
+    /* RANGES & SLIDERS */
+    .range-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    input[type="range"] {
+      flex: 1;
+      height: 5px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 3px;
+      outline: none;
+      accent-color: var(--accent-cyan);
+      cursor: pointer;
+    }
+
+    /* CUT STYLE SELECTOR TILES */
+    .cut-style-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .cut-tile {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 10px 6px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .cut-tile:hover {
+      background: rgba(30, 41, 59, 0.8);
+      border-color: rgba(6, 182, 212, 0.4);
+    }
+
+    .cut-tile.active {
+      background: rgba(6, 182, 212, 0.15);
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 12px var(--accent-cyan-glow);
+    }
+
+    .cut-tile svg {
+      width: 24px;
+      height: 24px;
+      stroke: var(--text-muted);
+      fill: none;
+      transition: stroke 0.2s ease;
+    }
+
+    .cut-tile.active svg {
+      stroke: var(--accent-cyan);
+    }
+
+    .cut-tile span {
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      line-height: 1.1;
+    }
+
+    .cut-tile.active span {
+      color: #fff;
+    }
+
+    /* SPECIFICATIONS GRID */
+    .spec-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      background: rgba(9, 12, 16, 0.6);
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+    }
+
+    .spec-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .spec-label {
+      color: var(--text-dim);
+      font-size: 0.65rem;
+      text-transform: uppercase;
+    }
+
+    .spec-val {
+      color: var(--accent-cyan);
+      font-weight: 600;
+    }
+
+    /* MAIN VIEWPORT CENTER */
+    .viewport-center {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      background: #05070a;
+      overflow: hidden;
+    }
+
+    .viewport-toolbar {
+      position: absolute;
+      top: 16px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+      background: rgba(13, 17, 23, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--bg-card-border);
+      border-radius: 30px;
+      padding: 4px 8px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .v-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .v-btn:hover {
+      color: #fff;
+      background: rgba(255,255,255,0.08);
+    }
+
+    .v-btn.active {
+      background: var(--accent-cyan);
+      color: #000;
+      box-shadow: 0 0 10px var(--accent-cyan-glow);
+    }
+
+    #threejs-canvas-container {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    /* VIEWPORT OVERLAY CONTROLS */
+    .viewport-overlay-bottom {
+      position: absolute;
+      bottom: 16px;
+      left: 16px;
+      right: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      pointer-events: none;
+      z-index: 20;
+    }
+
+    .overlay-card {
+      pointer-events: auto;
+      background: rgba(13, 17, 23, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--bg-card-border);
+      border-radius: 10px;
+      padding: 8px 14px;
+      font-size: 0.72rem;
+      font-family: var(--font-mono);
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .preset-views {
+      pointer-events: auto;
+      display: flex;
+      gap: 6px;
+    }
+
+    /* PATTERN / COLOR SELECTOR SWATCHES */
+    .swatch-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+    }
+
+    .swatch {
+      aspect-ratio: 1;
+      border-radius: 8px;
+      border: 2px solid rgba(255,255,255,0.15);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .swatch:hover {
+      transform: scale(1.08);
+      border-color: #fff;
+    }
+
+    .swatch.active {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 10px var(--accent-cyan-glow);
+    }
+
+    .swatch span {
+      position: absolute;
+      bottom: 2px;
+      left: 2px;
+      right: 2px;
+      background: rgba(0,0,0,0.7);
+      font-size: 0.58rem;
+      text-align: center;
+      color: #fff;
+      border-radius: 3px;
+      padding: 1px 0;
+    }
+
+    /* FABRICATION PROTOCOL SIDEBAR STYLES */
+    .protocol-card {
+      border-color: rgba(139, 92, 246, 0.3);
+      background: linear-gradient(180deg, rgba(20, 16, 38, 0.8), rgba(13, 17, 23, 0.9));
+    }
+
+    .protocol-step {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+      align-items: flex-start;
+    }
+
+    .protocol-step:last-child {
+      margin-bottom: 0;
+    }
+
+    .step-num {
+      width: 24px;
+      height: 24px;
+      background: rgba(139, 92, 246, 0.2);
+      border: 1px solid var(--accent-purple);
+      color: var(--accent-purple);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .step-content h4 {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 2px;
+    }
+
+    .step-content p {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      line-height: 1.35;
+    }
+
+    /* BLUEPRINT PREVIEW & PRINT STYLES */
+    #print-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(16px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .modal-content {
+      background: #0f172a;
+      border: 1px solid var(--accent-cyan);
+      border-radius: 16px;
+      width: 90%;
+      max-width: 900px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+      overflow: hidden;
+    }
+
+    .modal-header {
+      padding: 16px 24px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-body {
+      padding: 24px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      background: #090c10;
+    }
+
+    /* PRINT CONTAINER (PHYSICAL 1:1 UNITS) */
+    #printable-container {
+      background: #ffffff;
+      color: #000;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      border-radius: 4px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20mm;
+      box-sizing: border-box;
+      /* Default preview width in browser */
+      width: 210mm; 
+      min-height: 297mm; /* Standard A4 */
+    }
+
+    .blueprint-svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    /* HIDDEN PRINT CSS FOR PHYSICAL PRINTERS */
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #print-modal, #print-modal * {
+        visibility: visible;
+      }
+      #print-modal {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: #fff !important;
+        padding: 0 !important;
+        display: block !important;
+      }
+      .modal-content {
+        border: none !important;
+        box-shadow: none !important;
+        width: 100% !important;
+        max-width: none !important;
+        max-height: none !important;
+        background: #fff !important;
+      }
+      .modal-header, .modal-footer {
+        display: none !important;
+      }
+      #printable-container {
+        width: 210mm !important;
+        height: 297mm !important;
+        padding: 10mm !important;
+        margin: 0 auto !important;
+        box-shadow: none !important;
+      }
+      @page {
+        size: A4 portrait;
+        margin: 0;
+      }
+    }
+
+    /* OFFSCREEN CANVAS FOR TEXTURE CREATION */
+    #offscreen-canvas {
+      display: none;
+    }
+
+    /* HELPER CLASSES */
+    .hidden { display: none !important; }
+    .flex-row { display: flex; gap: 8px; align-items: center; }
+  </style>
+</head>
+<body>
+
+  <!-- APP HEADER -->
+  <header>
+    <div class="brand-title">
+      <div class="brand-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="5" y="2" width="14" height="20" rx="3" ry="3"></rect>
+          <line x1="12" y1="18" x2="12.01" y2="18"></line>
+          <path d="M9 6h6"></path>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>ANTI-GRAVITY SKIN STUDIO</h1>
+        <p>PRECISION FABRICATION & NANO-SUCTION CAD ENGINE</p>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <div class="badge-status">
+        <span class="status-dot"></span>
+        <span id="api-status-text">MATRIX REGISTRY: CONNECTED</span>
+      </div>
+
+      <button class="btn btn-accent" id="btn-open-blueprint">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+        Print Blueprint (1:1)
+      </button>
+
+      <button class="btn btn-primary" id="btn-export-svg">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export Vector Cut (.SVG)
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN APP CONTAINER -->
+  <div class="app-container">
+
+    <!-- LEFT SIDEBAR: DEVICE & CUT CONTROLS -->
+    <aside class="sidebar">
+      
+      <!-- CARD 1: DEVICE SELECTION ARCHITECTURE -->
+      <div class="card">
+        <div class="card-title">
+          <span>1. Hardware Spec Search</span>
+          <svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        </div>
+
+        <div class="form-group search-container">
+          <label for="device-search-input">Search Hardware Registry</label>
+          <input type="text" id="device-search-input" placeholder="e.g. iPhone 18 Pro Max, Pixel 11 Pro..." autocomplete="off" value="iPhone 18 Pro Max" />
+          <div class="autocomplete-list" id="autocomplete-list"></div>
+        </div>
+
+        <!-- LIVE DEVICE SPECIFICATIONS MATRIX -->
+        <div class="spec-grid" id="spec-grid-display">
+          <div class="spec-item">
+            <span class="spec-label">Width x Height</span>
+            <span class="spec-val" id="spec-dim-wh">77.6 x 163.0 mm</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-label">Corner Radius</span>
+            <span class="spec-val" id="spec-dim-radius">12.0 mm</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-label">Camera Bump</span>
+            <span class="spec-val" id="spec-dim-bump">38.0 x 40.0 mm</span>
+          </div>
+          <div class="spec-item">
+            <span class="spec-label">Layout Architecture</span>
+            <span class="spec-val" id="spec-layout-flag">Square-Island</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD 2: CUT & STYLE VARIATION LOGIC -->
+      <div class="card">
+        <div class="card-title">
+          <span>2. Skin Cut Style Variation</span>
+          <svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        </div>
+
+        <div class="cut-style-grid">
+          <div class="cut-tile active" data-style="standard">
+            <svg viewBox="0 0 24 24" stroke-width="1.8">
+              <rect x="6" y="3" width="12" height="18" rx="3"></rect>
+              <rect x="8" y="5" width="4" height="4" rx="1" stroke-dasharray="2 1"></rect>
+            </svg>
+            <span>Standard Precision Cut</span>
+          </div>
+
+          <div class="cut-tile" data-style="fullwrap">
+            <svg viewBox="0 0 24 24" stroke-width="1.8">
+              <rect x="6" y="3" width="12" height="18" rx="3"></rect>
+              <circle cx="9" cy="6" r="1"></circle>
+              <circle cx="11" cy="6" r="1"></circle>
+              <circle cx="9" cy="8" r="1"></circle>
+            </svg>
+            <span>Full Wrap / Camera Overlay</span>
+          </div>
+
+          <div class="cut-tile" data-style="armor">
+            <svg viewBox="0 0 24 24" stroke-width="1.8">
+              <rect x="6" y="5" width="12" height="14" rx="2"></rect>
+              <path d="M4 7v10M20 7v10M8 3h8M8 21h8" stroke-dasharray="2 1"></path>
+            </svg>
+            <span>Side-Wrap Armor Style</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD 3: MATERIAL & COLOR BASE -->
+      <div class="card">
+        <div class="card-title">
+          <span>3. Material Base & Textures</span>
+          <svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        </div>
+
+        <div class="form-group">
+          <label>Preset Procedural Textures</label>
+          <div class="swatch-grid" id="texture-swatches">
+            <div class="swatch active" data-preset="carbon" style="background: repeating-linear-gradient(45deg, #111 0px, #111 2px, #222 2px, #222 4px);"><span>Carbon</span></div>
+            <div class="swatch" data-preset="cybergrid" style="background: radial-gradient(circle, #06b6d4 10%, #05070a 90%);"><span>Cyber</span></div>
+            <div class="swatch" data-preset="holographic" style="background: linear-gradient(135deg, #f43f5e, #8b5cf6, #06b6d4);"><span>Holo</span></div>
+            <div class="swatch" data-preset="nanohex" style="background: repeating-linear-gradient(60deg, #1e293b 0 5px, #0f172a 5px 10px);"><span>NanoHex</span></div>
+            <div class="swatch" data-preset="titanium" style="background: linear-gradient(180deg, #94a3b8, #475569);"><span>Titanium</span></div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="base-color-picker">Base Color Tint</label>
+          <div class="flex-row">
+            <input type="color" id="base-color-picker" value="#0f172a" style="width: 44px; height: 36px; padding: 2px; cursor: pointer;" />
+            <input type="text" id="base-color-text" value="#0f172a" style="flex:1;" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="upload-image-input">Upload Custom Image / Pattern</label>
+          <input type="file" id="upload-image-input" accept="image/*" style="font-size: 0.75rem;" />
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- CENTER 3D VIEWPORT -->
+    <main class="viewport-center">
+      
+      <!-- TOOLBAR OVERLAY -->
+      <div class="viewport-toolbar">
+        <button class="v-btn active" id="btn-mode-3d">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+          Interactive 3D Chassis
+        </button>
+        <button class="v-btn" id="btn-mode-2d">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+          Live 2D Texture Canvas
+        </button>
+      </div>
+
+      <!-- THREE.JS CONTAINER -->
+      <div id="threejs-canvas-container"></div>
+
+      <!-- 2D CANVAS CONTAINER (VISIBLE WHEN 2D MODE TOGGLED) -->
+      <div id="live-2d-canvas-wrap" style="display:none; width:100%; height:100%; align-items:center; justify-content:center; background:#070a0f;">
+        <canvas id="visible-2d-canvas" style="max-width:85%; max-height:85%; border:1px solid var(--accent-cyan); box-shadow:0 0 30px rgba(6,182,212,0.2); border-radius:12px;"></canvas>
+      </div>
+
+      <!-- VIEWPORT BOTTOM OVERLAY CONTROLS -->
+      <div class="viewport-overlay-bottom">
+        <div class="overlay-card">
+          <span>VIEWPORT: <strong id="cam-preset-name" style="color:var(--accent-cyan)">ISOMETRIC 360°</strong></span>
+          <span>SCALE: <strong>1:1 REAL-WORLD MM</strong></span>
+        </div>
+
+        <div class="preset-views">
+          <button class="btn" id="btn-view-back">Back View</button>
+          <button class="btn" id="btn-view-iso">Isometric</button>
+          <button class="btn" id="btn-view-bump">Camera Close-up</button>
+          <button class="btn" id="btn-view-side">Edge Flaps</button>
+        </div>
+      </div>
+    </main>
+
+    <!-- RIGHT SIDEBAR: GRAPHICS & FABRICATION PROTOCOL -->
+    <aside class="sidebar sidebar-right">
+      
+      <!-- CARD 4: GRAPHICS & TEXT OVERLAY -->
+      <div class="card">
+        <div class="card-title">
+          <span>4. Image & Text Layers</span>
+          <svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+        </div>
+
+        <!-- IMAGE CONTROLS -->
+        <div class="form-group">
+          <label>Image Scale <span class="val-disp" id="val-img-scale">100%</span></label>
+          <div class="range-wrap">
+            <input type="range" id="input-img-scale" min="20" max="300" value="100" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Image Offset X / Y</label>
+          <div class="flex-row">
+            <input type="range" id="input-img-x" min="-500" max="500" value="0" />
+            <input type="range" id="input-img-y" min="-500" max="500" value="0" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Image Rotation <span class="val-disp" id="val-img-rot">0°</span></label>
+          <div class="range-wrap">
+            <input type="range" id="input-img-rot" min="-180" max="180" value="0" />
+          </div>
+        </div>
+
+        <hr style="border:0; border-top:1px solid rgba(255,255,255,0.08); margin:12px 0;" />
+
+        <!-- TEXT CONTROLS -->
+        <div class="form-group">
+          <label for="input-custom-text">Typography Overlay</label>
+          <input type="text" id="input-custom-text" placeholder="Enter custom text..." value="ANTI-GRAVITY NANO" />
+        </div>
+
+        <div class="form-group">
+          <label>Font Family & Size</label>
+          <div class="flex-row">
+            <select id="select-font-family" style="flex:2;">
+              <option value="Orbitron">Orbitron (Cyber)</option>
+              <option value="Space Grotesk">Space Grotesk</option>
+              <option value="Fira Code">Fira Code (Mono)</option>
+              <option value="Inter">Inter Clean</option>
+              <option value="Impact">Impact Heavy</option>
+            </select>
+            <input type="number" id="input-font-size" value="48" min="12" max="150" style="flex:1; width:60px;" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Text Color & Stroke</label>
+          <div class="flex-row">
+            <input type="color" id="input-text-color" value="#06b6d4" style="width:40px; height:34px;" />
+            <input type="color" id="input-text-stroke" value="#000000" style="width:40px; height:34px;" />
+            <select id="select-text-style" style="flex:1;">
+              <option value="fill-stroke">Fill + Stroke</option>
+              <option value="fill">Fill Only</option>
+              <option value="stroke">Outline Only</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Text Position X / Y</label>
+          <div class="flex-row">
+            <input type="range" id="input-text-x" min="-400" max="400" value="0" />
+            <input type="range" id="input-text-y" min="-400" max="400" value="250" />
+          </div>
+        </div>
+      </div>
+
+      <!-- CARD 5: COMPREHENSIVE MATERIAL FABRICATION PROTOCOL -->
+      <div class="card protocol-card">
+        <div class="card-title" style="color:var(--accent-purple); border-bottom-color:rgba(139,92,246,0.2)">
+          <span>Industrial Material Matrix</span>
+          <svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-purple)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+
+        <div style="font-size:0.7rem; color:var(--text-muted); margin-bottom:12px; line-height:1.4;">
+          <strong>Nano-Suction Anti-Gravity Fabrication Protocol:</strong> Follow exact specifications below for physical plotters and vinyl cutters.
+        </div>
+
+        <div class="protocol-step">
+          <div class="step-num">01</div>
+          <div class="step-content">
+            <h4>Substrate Material Specification</h4>
+            <p>Use 0.15mm Micro-Vacuum Nano-Suction Acrylic Foamed Sheets (1,000+ microscopic suction cups per cm²). No sticky chemical adhesive; leaves zero residue.</p>
+          </div>
+        </div>
+
+        <div class="protocol-step">
+          <div class="step-num">02</div>
+          <div class="step-content">
+            <h4>High-DPI Calibration & Print Settings</h4>
+            <p>Set printer scale factor to <strong>EXACTLY 100%</strong> (Disable 'Fit to Printable Area'). Set profile to 600 DPI High-Gloss/Matte Vinyl media.</p>
+          </div>
+        </div>
+
+        <div class="protocol-step">
+          <div class="step-num">03</div>
+          <div class="step-content">
+            <h4>UV Top-Coat & Protection Layer</h4>
+            <p>Apply a 50-micron liquid UV-curable matte top-coat or cold-laminate film to shield against palm sebum, friction degradation, and sweat.</p>
+          </div>
+        </div>
+
+        <div class="protocol-step">
+          <div class="step-num">04</div>
+          <div class="step-content">
+            <h4>Vinyl Plotter & Cutter Pressure</h4>
+            <p>45° / 60° Carbide blade, Downforce pressure: <strong>140g - 160g</strong>, Speed: 150 mm/s. Blade offset calibrated to 0.25mm.</p>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+  </div>
+
+  <!-- PRINT & SVG BLUEPRINT MODAL -->
+  <div id="print-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="flex-row">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          <h3 style="font-family:var(--font-heading); font-size:1rem; color:#fff">CALIBRATED 1:1 PRINT BLUEPRINT</h3>
+        </div>
+        <div class="flex-row">
+          <button class="btn btn-primary" onclick="window.print()">Trigger System Print (100% Scale)</button>
+          <button class="btn" id="btn-close-modal">Close</button>
+        </div>
+      </div>
+
+      <div class="modal-body">
+        <!-- PHYSICAL PRINT CONTAINER (A4 SIZE IN MM) -->
+        <div id="printable-container">
+          <div style="width:100%; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #ddd; padding-bottom:8px; margin-bottom:12px;">
+            <div>
+              <h2 style="font-size:12pt; margin:0; color:#000; font-weight:800; font-family:sans-serif">ANTI-GRAVITY NANO-SUCTION SKIN CUT SPECIFICATION</h2>
+              <div style="font-size:8pt; color:#666" id="print-device-name-title">DEVICE: APPLE IPHONE 18 PRO MAX | SCALE: 100% (1:1 TRUE MM)</div>
+            </div>
+            <div style="text-align:right; font-size:8pt; color:#333; font-family:monospace" id="print-timestamp">
+              300 DPI CALIBRATED
+            </div>
+          </div>
+
+          <!-- DYNAMIC SVG VECTOR BLUEPRINT -->
+          <div style="flex:1; width:100%; display:flex; align-items:center; justify-content:center;" id="svg-blueprint-wrapper">
+            <!-- SVG will be rendered here dynamically -->
+          </div>
+
+          <div style="width:100%; border-top:1px dashed #bbb; padding-top:8px; margin-top:12px; display:flex; justify-content:space-between; font-size:7pt; color:#555; font-family:monospace">
+            <span>[+] ALIGNMENT CORNER REGISTRATION MARKS</span>
+            <span>CUTTER SPEC: RED = 0.5px DASHED CUT LINE | BLUE = CREASE FOLD</span>
+            <span>ANTI-GRAVITY INDUSTRIAL CAD V3.4</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OFFSCREEN CANVAS FOR TEXTURE COMPOSITION -->
+  <canvas id="offscreen-canvas" width="2048" height="2048"></canvas>
+
+  <!-- MODERN ES6+ VANILLA JAVASCRIPT APPLICATION -->
+  <script>
+    /**
+     * ANTI-GRAVITY SMART PHONE SKIN STUDIO
+     * Architectural Engine & Three.js 3D Viewport Core Logic
+     */
+
+    // --- 1. HARDWARE DATABASE REGISTRY & API SIMULATOR ---
+    const HARDWARE_DATABASE = [
+      {
+        name: "iPhone 18 Pro Max",
+        aliases: ["iphone 18 pro max", "iphone18promax", "apple 18"],
+        width: 77.6,
+        height: 163.0,
+        thickness: 8.25,
+        radius: 12.5,
+        bump: { width: 39.0, height: 41.0, top: 12.0, left: 12.0, radius: 10.0 },
+        layout: "square-island",
+        lenses: [
+          { x: 23.5, y: 22.0, r: 8.0 },
+          { x: 23.5, y: 43.0, r: 8.0 },
+          { x: 39.0, y: 32.5, r: 8.0 }
+        ]
+      },
+      {
+        name: "iPhone 17 Pro",
+        aliases: ["iphone 17 pro", "iphone 17", "iphone17pro"],
+        width: 71.5,
+        height: 149.6,
+        thickness: 8.25,
+        radius: 11.0,
+        bump: { width: 37.0, height: 38.0, top: 11.0, left: 11.0, radius: 9.0 },
+        layout: "square-island",
+        lenses: [
+          { x: 21.0, y: 21.0, r: 7.5 },
+          { x: 21.0, y: 39.0, r: 7.5 },
+          { x: 36.0, y: 30.0, r: 7.5 }
+        ]
+      },
+      {
+        name: "Samsung Galaxy S27 Ultra",
+        aliases: ["samsung s27 ultra", "s27 ultra", "samsung s27", "galaxy s27"],
+        width: 79.0,
+        height: 163.4,
+        thickness: 8.6,
+        radius: 4.5,
+        bump: { width: 34.0, height: 85.0, top: 14.0, left: 10.0, radius: 6.0 },
+        layout: "vertical-stack",
+        lenses: [
+          { x: 27.0, y: 27.0, r: 7.5 },
+          { x: 27.0, y: 52.0, r: 7.5 },
+          { x: 27.0, y: 77.0, r: 7.5 },
+          { x: 12.0, y: 39.5, r: 5.5 }
+        ]
+      },
+      {
+        name: "Google Pixel 11 Pro",
+        aliases: ["pixel 11 pro", "google pixel 11", "pixel 11"],
+        width: 76.6,
+        height: 162.8,
+        thickness: 8.5,
+        radius: 14.0,
+        bump: { width: 72.6, height: 32.0, top: 16.0, left: 2.0, radius: 14.0 },
+        layout: "horizontal-visor",
+        lenses: [
+          { x: 22.0, y: 32.0, r: 7.0 },
+          { x: 38.3, y: 32.0, r: 7.0 },
+          { x: 54.6, y: 32.0, r: 7.0 }
+        ]
+      },
+      {
+        name: "Nothing Phone (3)",
+        aliases: ["nothing phone 3", "nothing 3", "nothing phone"],
+        width: 76.4,
+        height: 162.1,
+        thickness: 8.6,
+        radius: 13.0,
+        bump: { width: 34.0, height: 60.0, top: 16.0, left: 21.2, radius: 10.0 },
+        layout: "pill-island",
+        lenses: [
+          { x: 38.2, y: 31.0, r: 8.0 },
+          { x: 38.2, y: 55.0, r: 8.0 }
+        ]
+      }
+    ];
+
+    // CURRENT STATE MANAGEMENT
+    const State = {
+      activeDevice: HARDWARE_DATABASE[0],
+      cutStyle: 'standard', // 'standard' | 'fullwrap' | 'armor'
+      viewMode: '3d', // '3d' | '2d'
+      materialPreset: 'carbon',
+      baseColor: '#0f172a',
+      uploadedImage: null,
+      imgScale: 1.0,
+      imgX: 0,
+      imgY: 0,
+      imgRot: 0,
+      customText: 'ANTI-GRAVITY NANO',
+      fontFamily: 'Orbitron',
+      fontSize: 48,
+      textColor: '#06b6d4',
+      textStroke: '#000000',
+      textStyle: 'fill-stroke',
+      textX: 0,
+      textY: 250
+    };
+
+    // --- 2. OFFSCREEN 2D TEXTURE COMPOSITOR ---
+    const offscreenCanvas = document.getElementById('offscreen-canvas');
+    const offCtx = offscreenCanvas.getContext('2d');
+
+    function renderTextureCanvas() {
+      const W = offscreenCanvas.width;
+      const H = offscreenCanvas.height;
+
+      // Fill base background color
+      offCtx.fillStyle = State.baseColor;
+      offCtx.fillRect(0, 0, W, H);
+
+      // Render preset procedural textures
+      if (State.materialPreset === 'carbon') {
+        drawCarbonFiberPattern(offCtx, W, H);
+      } else if (State.materialPreset === 'cybergrid') {
+        drawCyberGridPattern(offCtx, W, H);
+      } else if (State.materialPreset === 'holographic') {
+        drawHolographicPattern(offCtx, W, H);
+      } else if (State.materialPreset === 'nanohex') {
+        drawNanoHexPattern(offCtx, W, H);
+      } else if (State.materialPreset === 'titanium') {
+        drawTitaniumPattern(offCtx, W, H);
+      }
+
+      // Render custom uploaded image if available
+      if (State.uploadedImage) {
+        offCtx.save();
+        offCtx.translate(W / 2 + State.imgX, H / 2 + State.imgY);
+        offCtx.rotate((State.imgRot * Math.PI) / 180);
+        const imgW = State.uploadedImage.width * State.imgScale;
+        const imgH = State.uploadedImage.height * State.imgScale;
+        offCtx.drawImage(State.uploadedImage, -imgW / 2, -imgH / 2, imgW, imgH);
+        offCtx.restore();
+      }
+
+      // Render typography layer
+      if (State.customText && State.customText.trim() !== '') {
+        offCtx.save();
+        offCtx.translate(W / 2 + State.textX, H / 2 + State.textY);
+        offCtx.font = `bold ${State.fontSize * 1.8}px "${State.fontFamily}", sans-serif`;
+        offCtx.textAlign = 'center';
+        offCtx.textBaseline = 'middle';
+
+        if (State.textStyle === 'fill-stroke' || State.textStyle === 'stroke') {
+          offCtx.strokeStyle = State.textStroke;
+          offCtx.lineWidth = 12;
+          offCtx.strokeText(State.customText, 0, 0);
+        }
+        if (State.textStyle === 'fill-stroke' || State.textStyle === 'fill') {
+          offCtx.fillStyle = State.textColor;
+          offCtx.fillText(State.customText, 0, 0);
+        }
+        offCtx.restore();
+      }
+
+      // Render Anti-Gravity Nano Tech Stamp
+      drawTechDecals(offCtx, W, H);
+
+      // Update Three.js Texture if initialized
+      if (threeTexture) {
+        threeTexture.needsUpdate = true;
+      }
+
+      // Also sync visible 2D preview canvas if 2D mode is active
+      const visible2dCanvas = document.getElementById('visible-2d-canvas');
+      if (visible2dCanvas) {
+        visible2dCanvas.width = 1024;
+        visible2dCanvas.height = 1024;
+        const visCtx = visible2dCanvas.getContext('2d');
+        visCtx.drawImage(offscreenCanvas, 0, 0, 1024, 1024);
+      }
+    }
+
+    // PROCEDURAL PATTERN GENERATORS
+    function drawCarbonFiberPattern(ctx, W, H) {
+      const pCanvas = document.createElement('canvas');
+      pCanvas.width = 16;
+      pCanvas.height = 16;
+      const pCtx = pCanvas.getContext('2d');
+      pCtx.fillStyle = 'rgba(0,0,0,0.4)';
+      pCtx.fillRect(0,0,16,16);
+      pCtx.fillStyle = 'rgba(255,255,255,0.06)';
+      pCtx.fillRect(0,0,8,8);
+      pCtx.fillRect(8,8,8,8);
+      const pattern = ctx.createPattern(pCanvas, 'repeat');
+      ctx.fillStyle = pattern;
+      ctx.fillRect(0, 0, W, H);
+    }
+
+    function drawCyberGridPattern(ctx, W, H) {
+      ctx.save();
+      ctx.strokeStyle = 'rgba(6, 182, 212, 0.25)';
+      ctx.lineWidth = 3;
+      const step = 64;
+      for (let x = 0; x <= W; x += step) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+      }
+      for (let y = 0; y <= H; y += step) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function drawHolographicPattern(ctx, W, H) {
+      const grad = ctx.createLinearGradient(0, 0, W, H);
+      grad.addColorStop(0, 'rgba(244, 63, 94, 0.3)');
+      grad.addColorStop(0.5, 'rgba(139, 92, 246, 0.3)');
+      grad.addColorStop(1, 'rgba(6, 182, 212, 0.3)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+    }
+
+    function drawNanoHexPattern(ctx, W, H) {
+      ctx.save();
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+      ctx.lineWidth = 2;
+      const r = 24;
+      const h = r * Math.sqrt(3);
+      for (let y = -r; y < H + r; y += h) {
+        for (let x = -r; x < W + r; x += r * 3) {
+          drawHexagon(ctx, x, y, r);
+          drawHexagon(ctx, x + r * 1.5, y + h / 2, r);
+        }
+      }
+      ctx.restore();
+    }
+
+    function drawHexagon(ctx, x, y, r) {
+      ctx.beginPath();
+      for (let i = 0; i < 6; i++) {
+        const angle = (Math.PI / 3) * i;
+        const hx = x + r * Math.cos(angle);
+        const hy = y + r * Math.sin(angle);
+        if (i === 0) ctx.moveTo(hx, hy);
+        else ctx.lineTo(hx, hy);
+      }
+      ctx.closePath();
+      ctx.stroke();
+    }
+
+    function drawTitaniumPattern(ctx, W, H) {
+      const grad = ctx.createLinearGradient(0, 0, W, 0);
+      grad.addColorStop(0, 'rgba(255, 255, 255, 0.02)');
+      grad.addColorStop(0.5, 'rgba(255, 255, 255, 0.12)');
+      grad.addColorStop(1, 'rgba(255, 255, 255, 0.02)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+    }
+
+    function drawTechDecals(ctx, W, H) {
+      ctx.save();
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+      ctx.font = '16px "Fira Code", monospace';
+      ctx.fillText(`NANO-SUCTION CAD v3.4 | ${State.activeDevice.name.toUpperCase()}`, 60, H - 60);
+      ctx.fillText(`CUT STYLE: ${State.cutStyle.toUpperCase()}`, 60, H - 40);
+      ctx.restore();
+    }
+
+    // --- 3. THREE.JS 3D VIEWPORT ENGINE ---
+    let scene, camera, renderer, controls;
+    let phoneGroup, backSkinMesh, chassisMesh, cameraBumpMesh, sideWingsMesh;
+    let threeTexture;
+
+    function initThreeJS() {
+      const container = document.getElementById('threejs-canvas-container');
+      const width = container.clientWidth;
+      const height = container.clientHeight;
+
+      // Scene
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x05070a);
+
+      // Camera
+      camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+      camera.position.set(0, 0, 260);
+
+      // Renderer
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+      renderer.setSize(width, height);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      container.appendChild(renderer.domElement);
+
+      // Orbit Controls
+      controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.05;
+      controls.maxDistance = 500;
+      controls.minDistance = 80;
+
+      // Lighting Setup
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.75);
+      scene.add(ambientLight);
+
+      const dirLight1 = new THREE.DirectionalLight(0xffffff, 1.2);
+      dirLight1.position.set(100, 150, 200);
+      dirLight1.castShadow = true;
+      scene.add(dirLight1);
+
+      const dirLight2 = new THREE.DirectionalLight(0x06b6d4, 0.8);
+      dirLight2.position.set(-100, -100, -100);
+      scene.add(dirLight2);
+
+      // Create Three.js Canvas Texture
+      threeTexture = new THREE.CanvasTexture(offscreenCanvas);
+      threeTexture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+
+      // Root Phone Group
+      phoneGroup = new THREE.Group();
+      scene.add(phoneGroup);
+
+      // Initial Mesh Construction
+      rebuildPhone3DModel();
+
+      // Window Resize Listener
+      window.addEventListener('resize', onWindowResize);
+
+      // Animation Loop
+      animate();
+    }
+
+    function rebuildPhone3DModel() {
+      if (!phoneGroup) return;
+
+      // Clear previous meshes
+      while (phoneGroup.children.length > 0) {
+        const child = phoneGroup.children[0];
+        if (child.geometry) child.geometry.dispose();
+        phoneGroup.remove(child);
+      }
+
+      const dev = State.activeDevice;
+      const W = dev.width;
+      const H = dev.height;
+      const D = dev.thickness;
+      const R = dev.radius;
+
+      // 1. CHASSIS MAIN BODY (Extruded Rounded Rectangle)
+      const shape = createRoundedRectShape(W, H, R);
+      const extrudeSettings = {
+        steps: 1,
+        depth: D,
+        bevelEnabled: true,
+        bevelThickness: 1.2,
+        bevelSize: 1.2,
+        bevelSegments: 5
+      };
+
+      const chassisGeo = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+      chassisGeo.center();
+
+      const metallicMat = new THREE.MeshStandardMaterial({
+        color: 0x334155,
+        metalness: 0.85,
+        roughness: 0.25
+      });
+
+      chassisMesh = new THREE.Mesh(chassisGeo, metallicMat);
+      chassisMesh.castShadow = true;
+      chassisMesh.receiveShadow = true;
+      phoneGroup.add(chassisMesh);
+
+      // 2. BACK PANEL SKIN MESH (Uploaded design texture canvas applied)
+      const skinGeo = new THREE.ShapeGeometry(shape);
+      skinGeo.center();
+
+      // Normalize UVs to map offscreen canvas correctly
+      const pos = skinGeo.attributes.position;
+      const uvs = new Float32Array((pos.count) * 2);
+      for (let i = 0; i < pos.count; i++) {
+        uvs[i * 2] = (pos.getX(i) + W / 2) / W;
+        uvs[i * 2 + 1] = (pos.getY(i) + H / 2) / H;
+      }
+      skinGeo.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
+
+      const skinMat = new THREE.MeshStandardMaterial({
+        map: threeTexture,
+        roughness: 0.35,
+        metalness: 0.1
+      });
+
+      backSkinMesh = new THREE.Mesh(skinGeo, skinMat);
+      backSkinMesh.position.z = D / 2 + 1.25; // Slightly above chassis surface
+      phoneGroup.add(backSkinMesh);
+
+      // 3. CAMERA BUMP MODULE
+      if (dev.bump) {
+        const bumpW = dev.bump.width;
+        const bumpH = dev.bump.height;
+        const bumpR = dev.bump.radius;
+        const bumpShape = createRoundedRectShape(bumpW, bumpH, bumpR);
+        
+        const bumpExtrudeSettings = {
+          steps: 1,
+          depth: 3.5,
+          bevelEnabled: true,
+          bevelThickness: 0.8,
+          bevelSize: 0.8,
+          bevelSegments: 3
+        };
+
+        const bumpGeo = new THREE.ExtrudeGeometry(bumpShape, bumpExtrudeSettings);
+        
+        // Position camera bump relative to device top-left
+        const bumpX = -W / 2 + dev.bump.left + bumpW / 2;
+        const bumpY = H / 2 - dev.bump.top - bumpH / 2;
+
+        let bumpMat;
+        if (State.cutStyle === 'fullwrap') {
+          // Full wrap style applies texture skin onto camera island!
+          bumpMat = skinMat;
+        } else {
+          // Standard and Armor style keep dark metallic camera island
+          bumpMat = new THREE.MeshStandardMaterial({
+            color: 0x0f172a,
+            metalness: 0.9,
+            roughness: 0.15
+          });
+        }
+
+        cameraBumpMesh = new THREE.Mesh(bumpGeo, bumpMat);
+        cameraBumpMesh.position.set(bumpX, bumpY, D / 2 + 1.3);
+        phoneGroup.add(cameraBumpMesh);
+
+        // LENSES GLASS ELEMENTS
+        if (dev.lenses) {
+          dev.lenses.forEach(lens => {
+            const lensGeo = new THREE.CylinderGeometry(lens.r, lens.r, 1.2, 32);
+            const lensMat = new THREE.MeshStandardMaterial({
+              color: 0x000000,
+              roughness: 0.05,
+              metalness: 0.95
+            });
+            const lensMesh = new THREE.Mesh(lensGeo, lensMat);
+            lensMesh.rotation.x = Math.PI / 2;
+            
+            const lx = -W / 2 + dev.bump.left + lens.x;
+            const ly = H / 2 - dev.bump.top - lens.y;
+            lensMesh.position.set(lx, ly, D / 2 + 5.2);
+            phoneGroup.add(lensMesh);
+          });
+        }
+      }
+
+      // 4. SIDE-WRAP ARMOR WINGS (If Cut Style === 'armor')
+      if (State.cutStyle === 'armor') {
+        const wingMat = skinMat;
+        const sideFlapW = D + 1.0;
+
+        // Left Wing
+        const leftWingGeo = new THREE.PlaneGeometry(sideFlapW, H);
+        const leftWingMesh = new THREE.Mesh(leftWingGeo, wingMat);
+        leftWingMesh.position.set(-W / 2 - sideFlapW / 2, 0, 0);
+        leftWingMesh.rotation.y = Math.PI / 2;
+        phoneGroup.add(leftWingMesh);
+
+        // Right Wing
+        const rightWingGeo = new THREE.PlaneGeometry(sideFlapW, H);
+        const rightWingMesh = new THREE.Mesh(rightWingGeo, wingMat);
+        rightWingMesh.position.set(W / 2 + sideFlapW / 2, 0, 0);
+        rightWingMesh.rotation.y = -Math.PI / 2;
+        phoneGroup.add(rightWingMesh);
+      }
+    }
+
+    function createRoundedRectShape(width, height, radius) {
+      const shape = new THREE.Shape();
+      const x = -width / 2;
+      const y = -height / 2;
+
+      shape.moveTo(x + radius, y);
+      shape.lineTo(x + width - radius, y);
+      shape.quadraticCurveTo(x + width, y, x + width, y + radius);
+      shape.lineTo(x + width, y + height - radius);
+      shape.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+      shape.lineTo(x + radius, y + height);
+      shape.quadraticCurveTo(x, y + height, x, y + height - radius);
+      shape.lineTo(x, y + radius);
+      shape.quadraticCurveTo(x, y, x + radius, y);
+
+      return shape;
+    }
+
+    function onWindowResize() {
+      const container = document.getElementById('threejs-canvas-container');
+      if (!container || !renderer || !camera) return;
+      const width = container.clientWidth;
+      const height = container.clientHeight;
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+      renderer.setSize(width, height);
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      if (controls) controls.update();
+      if (renderer && scene && camera) {
+        renderer.render(scene, camera);
+      }
+    }
+
+    // --- 4. TRUE-TO-SCALE CALIBRATED VECTOR SVG GENERATOR ---
+    function generateBlueprintSVG() {
+      const dev = State.activeDevice;
+      const W = dev.width;
+      const H = dev.height;
+      const R = dev.radius;
+      const D = dev.thickness;
+
+      // Margins for viewBox
+      const margin = State.cutStyle === 'armor' ? D + 25 : 20;
+      const viewBoxW = W + margin * 2;
+      const viewBoxH = H + margin * 2;
+
+      const originX = margin;
+      const originY = margin;
+
+      let svgHTML = `<svg class="blueprint-svg" viewBox="0 0 ${viewBoxW} ${viewBoxH}" xmlns="http://www.w3.org/2000/svg">`;
+
+      // Grid background pattern
+      svgHTML += `
+        <defs>
+          <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
+            <path d="M 10 0 L 0 0 0 10" fill="none" stroke="#f0f0f0" stroke-width="0.3"/>
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#grid)" />
+      `;
+
+      // Registration Alignment Corner Marks
+      const markLen = 8;
+      svgHTML += `
+        <!-- Registration Crosshairs -->
+        <g stroke="#000" stroke-width="0.5">
+          <line x1="${originX - 10}" y1="${originY - 10}" x2="${originX - 10 + markLen}" y2="${originY - 10}" />
+          <line x1="${originX - 10}" y1="${originY - 10}" x2="${originX - 10}" y2="${originY - 10 + markLen}" />
+          
+          <line x1="${originX + W + 10}" y1="${originY - 10}" x2="${originX + W + 10 - markLen}" y2="${originY - 10}" />
+          <line x1="${originX + W + 10}" y1="${originY - 10}" x2="${originX + W + 10}" y2="${originY - 10 + markLen}" />
+
+          <line x1="${originX - 10}" y1="${originY + H + 10}" x2="${originX - 10 + markLen}" y2="${originY + H + 10}" />
+          <line x1="${originX - 10}" y1="${originY + H + 10}" x2="${originX - 10}" y2="${originY + H + 10 - markLen}" />
+
+          <line x1="${originX + W + 10}" y1="${originY + H + 10}" x2="${originX + W + 10 - markLen}" y2="${originY + H + 10}" />
+          <line x1="${originX + W + 10}" y1="${originY + H + 10}" x2="${originX + W + 10}" y2="${originY + H + 10 - markLen}" />
+        </g>
+      `;
+
+      // MAIN BACK SKIN CUT PATH (Red Dashed Line)
+      const mainPath = getSVGPathRoundedRect(originX, originY, W, H, R);
+      svgHTML += `<path d="${mainPath}" fill="none" stroke="#ef4444" stroke-width="0.6" stroke-dasharray="2 1" />`;
+
+      // CAMERA BUMP & LENSES CUT PATHS
+      if (dev.bump) {
+        const bumpX = originX + dev.bump.left;
+        const bumpY = originY + dev.bump.top;
+
+        if (State.cutStyle === 'standard') {
+          // Standard style cuts out entire camera bump island
+          const bumpPath = getSVGPathRoundedRect(bumpX, bumpY, dev.bump.width, dev.bump.height, dev.bump.radius);
+          svgHTML += `<path d="${bumpPath}" fill="none" stroke="#ef4444" stroke-width="0.6" stroke-dasharray="2 1" />`;
+          svgHTML += `<text x="${bumpX + 2}" y="${bumpY - 3}" font-size="3" fill="#ef4444" font-family="monospace">CAMERA CUTOUT</text>`;
+        } else if (State.cutStyle === 'fullwrap') {
+          // Full wrap cuts out individual circular camera lenses
+          if (dev.lenses) {
+            dev.lenses.forEach((lens, idx) => {
+              const lx = bumpX + lens.x;
+              const ly = bumpY + lens.y;
+              svgHTML += `<circle cx="${lx}" cy="${ly}" r="${lens.r}" fill="none" stroke="#ef4444" stroke-width="0.6" stroke-dasharray="1.5 1" />`;
+              svgHTML += `<text x="${lx - 4}" y="${ly + 1}" font-size="2" fill="#ef4444" font-family="monospace">LENS ${idx+1}</text>`;
+            });
+          }
+        }
+      }
+
+      // SIDE-WRAP ARMOR FLAPS (Blue Dotted Line for Creases, Red for Cut)
+      if (State.cutStyle === 'armor') {
+        const flap = D + 1.0;
+        // Left Flap
+        svgHTML += `<rect x="${originX - flap}" y="${originY}" width="${flap}" height="${H}" fill="none" stroke="#ef4444" stroke-width="0.6" stroke-dasharray="2 1" />`;
+        svgHTML += `<line x1="${originX}" y1="${originY}" x2="${originX}" y2="${originY + H}" stroke="#3b82f6" stroke-width="0.4" stroke-dasharray="1 1" />`;
+        
+        // Right Flap
+        svgHTML += `<rect x="${originX + W}" y="${originY}" width="${flap}" height="${H}" fill="none" stroke="#ef4444" stroke-width="0.6" stroke-dasharray="2 1" />`;
+        svgHTML += `<line x1="${originX + W}" y1="${originY}" x2="${originX + W}" y2="${originY + H}" stroke="#3b82f6" stroke-width="0.4" stroke-dasharray="1 1" />`;
+      }
+
+      // DIMENSION ANNOTATIONS
+      svgHTML += `
+        <g font-size="3.5" fill="#333" font-family="monospace">
+          <text x="${originX + W / 2 - 15}" y="${originY - 4}">W: ${W} mm</text>
+          <text x="${originX + W + 4}" y="${originY + H / 2}">H: ${H} mm</text>
+          <text x="${originX + 4}" y="${originY + H - 4}">RADIUS: ${R} mm</text>
+        </g>
+      `;
+
+      svgHTML += `</svg>`;
+      return svgHTML;
+    }
+
+    function getSVGPathRoundedRect(x, y, w, h, r) {
+      return `M ${x + r} ${y} ` +
+        `L ${x + w - r} ${y} ` +
+        `A ${r} ${r} 0 0 1 ${x + w} ${y + r} ` +
+        `L ${x + w} ${y + h - r} ` +
+        `A ${r} ${r} 0 0 1 ${x + w - r} ${y + h} ` +
+        `L ${x + r} ${y + h} ` +
+        `A ${r} ${r} 0 0 1 ${x} ${y + h - r} ` +
+        `L ${x} ${y + r} ` +
+        `A ${r} ${r} 0 0 1 ${x + r} ${y} Z`;
+    }
+
+    // --- 5. UI EVENT LISTENERS & INTERACTION HANDLERS ---
+    function setupEventListeners() {
+      
+      // DEVICE SEARCH & AUTOCOMPLETE
+      const searchInput = document.getElementById('device-search-input');
+      const autocompleteList = document.getElementById('autocomplete-list');
+
+      searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.trim().toLowerCase();
+        if (!query) {
+          autocompleteList.style.display = 'none';
+          return;
+        }
+
+        const matches = HARDWARE_DATABASE.filter(dev => 
+          dev.name.toLowerCase().includes(query) || 
+          dev.aliases.some(a => a.includes(query))
+        );
+
+        if (matches.length > 0) {
+          autocompleteList.innerHTML = matches.map(dev => `
+            <div class="autocomplete-item" data-name="${dev.name}">
+              <span>${dev.name}</span>
+              <span class="tag">${dev.width}x${dev.height}mm</span>
+            </div>
+          `).join('');
+          autocompleteList.style.display = 'block';
+        } else {
+          // Dynamic Spec Fallback Simulation
+          autocompleteList.innerHTML = `
+            <div class="autocomplete-item" data-custom="${query}">
+              <span>Synthesize Custom Spec for "${query}"</span>
+              <span class="tag">AI CAD SIMULATOR</span>
+            </div>
+          `;
+          autocompleteList.style.display = 'block';
+        }
+      });
+
+      autocompleteList.addEventListener('click', (e) => {
+        const item = e.target.closest('.autocomplete-item');
+        if (!item) return;
+
+        const devName = item.getAttribute('data-name');
+        const customQuery = item.getAttribute('data-custom');
+
+        if (devName) {
+          const selected = HARDWARE_DATABASE.find(d => d.name === devName);
+          if (selected) setDeviceSpec(selected);
+        } else if (customQuery) {
+          // Generate realistic dynamic hardware spec for unlisted devices
+          const syntheticDev = {
+            name: customQuery.toUpperCase(),
+            width: 76.0,
+            height: 160.0,
+            thickness: 8.4,
+            radius: 12.0,
+            bump: { width: 36.0, height: 38.0, top: 12.0, left: 12.0, radius: 8.0 },
+            layout: "square-island",
+            lenses: [
+              { x: 20.0, y: 20.0, r: 7.5 },
+              { x: 20.0, y: 38.0, r: 7.5 }
+            ]
+          };
+          setDeviceSpec(syntheticDev);
+        }
+        autocompleteList.style.display = 'none';
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.search-container')) {
+          autocompleteList.style.display = 'none';
+        }
+      });
+
+      // CUT STYLE TILES
+      document.querySelectorAll('.cut-tile').forEach(tile => {
+        tile.addEventListener('click', () => {
+          document.querySelectorAll('.cut-tile').forEach(t => t.classList.remove('active'));
+          tile.classList.add('active');
+          State.cutStyle = tile.getAttribute('data-style');
+          rebuildPhone3DModel();
+          renderTextureCanvas();
+        });
+      });
+
+      // TEXTURE SWATCHES
+      document.querySelectorAll('.swatch').forEach(swatch => {
+        swatch.addEventListener('click', () => {
+          document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+          swatch.classList.add('active');
+          State.materialPreset = swatch.getAttribute('data-preset');
+          renderTextureCanvas();
+        });
+      });
+
+      // BASE COLOR PICKER
+      const colorPicker = document.getElementById('base-color-picker');
+      const colorText = document.getElementById('base-color-text');
+      colorPicker.addEventListener('input', (e) => {
+        State.baseColor = e.target.value;
+        colorText.value = e.target.value;
+        renderTextureCanvas();
+      });
+
+      // IMAGE UPLOAD
+      document.getElementById('upload-image-input').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (evt) => {
+            const img = new Image();
+            img.onload = () => {
+              State.uploadedImage = img;
+              renderTextureCanvas();
+            };
+            img.src = evt.target.result;
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      // IMAGE CONTROLS
+      bindRangeInput('input-img-scale', 'val-img-scale', '%', (v) => State.imgScale = v / 100);
+      bindRangeInput('input-img-x', null, null, (v) => State.imgX = parseInt(v));
+      bindRangeInput('input-img-y', null, null, (v) => State.imgY = parseInt(v));
+      bindRangeInput('input-img-rot', 'val-img-rot', '°', (v) => State.imgRot = parseInt(v));
+
+      // TYPOGRAPHY CONTROLS
+      document.getElementById('input-custom-text').addEventListener('input', (e) => {
+        State.customText = e.target.value;
+        renderTextureCanvas();
+      });
+      document.getElementById('select-font-family').addEventListener('change', (e) => {
+        State.fontFamily = e.target.value;
+        renderTextureCanvas();
+      });
+      document.getElementById('input-font-size').addEventListener('input', (e) => {
+        State.fontSize = parseInt(e.target.value) || 48;
+        renderTextureCanvas();
+      });
+      document.getElementById('input-text-color').addEventListener('input', (e) => {
+        State.textColor = e.target.value;
+        renderTextureCanvas();
+      });
+      document.getElementById('input-text-stroke').addEventListener('input', (e) => {
+        State.textStroke = e.target.value;
+        renderTextureCanvas();
+      });
+      document.getElementById('select-text-style').addEventListener('change', (e) => {
+        State.textStyle = e.target.value;
+        renderTextureCanvas();
+      });
+      bindRangeInput('input-text-x', null, null, (v) => State.textX = parseInt(v));
+      bindRangeInput('input-text-y', null, null, (v) => State.textY = parseInt(v));
+
+      // VIEWPORT MODES (3D vs 2D)
+      const btn3D = document.getElementById('btn-mode-3d');
+      const btn2D = document.getElementById('btn-mode-2d');
+      const container3D = document.getElementById('threejs-canvas-container');
+      const container2D = document.getElementById('live-2d-canvas-wrap');
+
+      btn3D.addEventListener('click', () => {
+        btn3D.classList.add('active');
+        btn2D.classList.remove('active');
+        container3D.style.display = 'block';
+        container2D.style.display = 'none';
+        State.viewMode = '3d';
+      });
+
+      btn2D.addEventListener('click', () => {
+        btn2D.classList.add('active');
+        btn3D.classList.remove('active');
+        container3D.style.display = 'none';
+        container2D.style.display = 'flex';
+        State.viewMode = '2d';
+        renderTextureCanvas();
+      });
+
+      // PRESET CAMERA VIEWS
+      document.getElementById('btn-view-back').addEventListener('click', () => setCameraPreset(0, 0, 240, 'BACK VIEW 180°'));
+      document.getElementById('btn-view-iso').addEventListener('click', () => setCameraPreset(120, 100, 200, 'ISOMETRIC 360°'));
+      document.getElementById('btn-view-bump').addEventListener('click', () => setCameraPreset(-20, 50, 110, 'CAMERA CLOSE-UP'));
+      document.getElementById('btn-view-side').addEventListener('click', () => setCameraPreset(220, 20, 160, 'EDGE FLAPS DETAIL'));
+
+      // PRINT & SVG BLUEPRINT MODAL
+      const printModal = document.getElementById('print-modal');
+      document.getElementById('btn-open-blueprint').addEventListener('click', () => {
+        openBlueprintModal();
+      });
+      document.getElementById('btn-close-modal').addEventListener('click', () => {
+        printModal.style.display = 'none';
+      });
+
+      // EXPORT SVG FILE
+      document.getElementById('btn-export-svg').addEventListener('click', () => {
+        const svgContent = generateBlueprintSVG();
+        const blob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `AntiGravity-CutSpec-${State.activeDevice.name.replace(/\s+/g, '_')}.svg`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      });
+    }
+
+    function bindRangeInput(inputId, dispId, unit, callback) {
+      const inp = document.getElementById(inputId);
+      if (!inp) return;
+      inp.addEventListener('input', (e) => {
+        const val = e.target.value;
+        if (dispId) {
+          document.getElementById(dispId).innerText = val + (unit || '');
+        }
+        callback(val);
+        renderTextureCanvas();
+      });
+    }
+
+    function setDeviceSpec(device) {
+      State.activeDevice = device;
+      document.getElementById('device-search-input').value = device.name;
+      document.getElementById('spec-dim-wh').innerText = `${device.width} x ${device.height} mm`;
+      document.getElementById('spec-dim-radius').innerText = `${device.radius} mm`;
+      document.getElementById('spec-dim-bump').innerText = device.bump ? `${device.bump.width} x ${device.bump.height} mm` : 'N/A';
+      document.getElementById('spec-layout-flag').innerText = device.layout.toUpperCase();
+
+      rebuildPhone3DModel();
+      renderTextureCanvas();
+    }
+
+    function setCameraPreset(x, y, z, name) {
+      if (!camera || !controls) return;
+      camera.position.set(x, y, z);
+      controls.target.set(0, 0, 0);
+      controls.update();
+      document.getElementById('cam-preset-name').innerText = name;
+    }
+
+    function openBlueprintModal() {
+      const printModal = document.getElementById('print-modal');
+      const wrapper = document.getElementById('svg-blueprint-wrapper');
+      document.getElementById('print-device-name-title').innerText = `DEVICE: ${State.activeDevice.name.toUpperCase()} | CUT STYLE: ${State.cutStyle.toUpperCase()} | SCALE: 100% (1:1 MM)`;
+      wrapper.innerHTML = generateBlueprintSVG();
+      printModal.style.display = 'flex';
+    }
+
+    // INITIALIZATION ON WINDOW LOAD
+    window.addEventListener('DOMContentLoaded', () => {
+      renderTextureCanvas();
+      initThreeJS();
+      setupEventListeners();
+    });
+  </script>
+</body>
+</html>
